@@ -11,7 +11,6 @@ import com.digitalinnovation.personapi.mappers.PersonMapper;
 import com.digitalinnovation.personapi.repositories.PersonRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,12 +27,9 @@ public class PersonService {
 	
 	public MessageResponseDTO createPerson(PersonDTO personDTO) {
 		Person personToSave = personMapper.toModel(personDTO);
-		
 		Person savedPerson = personRepository.save(personToSave);
-		return MessageResponseDTO
-				.builder()
-				.message("Created peraon with Id " + savedPerson.getId())
-				.build();
+
+		return createMessageResponse(savedPerson.getId(), "Created peraon with Id");
 	}
 
 	public List<PersonDTO> listAll() {
@@ -53,8 +49,23 @@ public class PersonService {
 		personRepository.deleteById(id);
 	}
 
+	public MessageResponseDTO updateById(Long id, PersonDTO personDTO) throws PersonNotFoundException {
+		verifyIfExists(id);
+		Person personToUpdate = personMapper.toModel(personDTO);
+		Person updatedPerson = personRepository.save(personToUpdate);
+
+		return createMessageResponse(updatedPerson.getId(), "Updated person with Id");
+	}
+
 	private Person verifyIfExists(Long id) throws PersonNotFoundException {
 		return personRepository.findById(id)
 				.orElseThrow(() -> new PersonNotFoundException(id));
+	}
+
+	private MessageResponseDTO createMessageResponse(Long id, String message) {
+		return MessageResponseDTO
+				.builder()
+				.message(message + id)
+				.build();
 	}
 }
