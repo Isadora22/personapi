@@ -9,6 +9,9 @@ import com.digitalinnovation.personapi.entities.Person;
 import com.digitalinnovation.personapi.mappers.PersonMapper;
 import com.digitalinnovation.personapi.repositories.PersonRepository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PersonService {
 		
@@ -31,4 +34,10 @@ public class PersonService {
 				.build();
 	}
 
+	public List<PersonDTO> listAll() {
+		List<Person> allPeople = personRepository.findAll();
+		return allPeople.stream()
+				.map(personMapper :: toDTO)
+				.collect(Collectors.toList());
+	}
 }
